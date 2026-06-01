@@ -1,0 +1,3538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EditPPT</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --sidebar-bg: #ffffff;
+    --panel-bg: #ffffff;
+    --modal-bg: #ffffff;
+    --code-bg: #f1f5f9;
+    --hover-bg: #e5e7eb;
+    --selected-bg: #eff6ff;
+    --img-bg: #fafafa;
+    --log-bg: #1e1e2e;
+    --log-header-bg: #2d2d3f;
+    --log-header-hover: #353548;
+    --log-header-text: #a6adc8;
+    --log-text: #cdd6f4;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-soft: #eff6ff;
+    --accent-soft-border: #93c5fd;
+    --accent-deep: #1e40af;
+    --success: #22c55e;
+    --success-hover: #16a34a;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --overlay: rgba(0, 0, 0, 0.4);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-lg: rgba(0, 0, 0, 0.15);
+    --btn-disabled: #94a3b8;
+    --note-bg: #eff6ff;
+    --note-text: #1e40af;
+    --warn-bg: #fff7ed;
+    --warn-border: #fdba74;
+    --warn-text: #ea580c;
+    --purple: #8b5cf6;
+    --purple-bg: #f5f3ff;
+    --purple-border: #c4b5fd;
+    --purple-text: #7c3aed;
+    --danger-bg: #fff5f5;
+    --danger-border: #fca5a5;
+    --danger-text: #dc2626;
+    --danger-hover-bg: #fee2e2;
+    --danger-hover-border: #f87171;
+    --danger-hover-text: #b91c1c;
+    --upload-warn-bg: #fef2f2;
+    --upload-warn-border: #fecaca;
+    --upload-warn-text: #991b1b;
+  }
+
+  [data-theme="dark"] {
+    --bg: #1a1b26;
+    --sidebar-bg: #1f2029;
+    --panel-bg: #1f2029;
+    --modal-bg: #24253a;
+    --code-bg: #2a2b3d;
+    --hover-bg: #2a2b3d;
+    --selected-bg: #1e2a3a;
+    --img-bg: #16171f;
+    --log-bg: #13141c;
+    --log-header-bg: #1a1b26;
+    --log-header-hover: #22232f;
+    --log-header-text: #7f849c;
+    --log-text: #a6adc8;
+    --accent: #7aa2f7;
+    --accent-hover: #5d87f0;
+    --accent-soft: #1e2a3a;
+    --accent-soft-border: #3d5a8a;
+    --accent-deep: #7aa2f7;
+    --success: #9ece6a;
+    --success-hover: #7fb652;
+    --warning: #e0af68;
+    --error: #f7768e;
+    --border: #33354a;
+    --text: #c0caf5;
+    --text-muted: #7f849c;
+    --overlay: rgba(0, 0, 0, 0.6);
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-lg: rgba(0, 0, 0, 0.4);
+    --btn-disabled: #565f89;
+    --note-bg: #1e2a3a;
+    --note-text: #7aa2f7;
+    --warn-bg: #2a2520;
+    --warn-border: #6b5430;
+    --warn-text: #e0af68;
+    --purple: #bb9af7;
+    --purple-bg: #25223a;
+    --purple-border: #5a4a8a;
+    --purple-text: #bb9af7;
+    --danger-bg: #2a2025;
+    --danger-border: #6b3040;
+    --danger-text: #f7768e;
+    --danger-hover-bg: #352030;
+    --danger-hover-border: #8b4050;
+    --danger-hover-text: #ff99aa;
+    --upload-warn-bg: #2a2025;
+    --upload-warn-border: #6b3040;
+    --upload-warn-text: #f7768e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header .file-info {
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* Main layout */
+  .main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .input-area {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .input-area textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-area textarea:focus { border-color: var(--accent); }
+
+  .input-area .btn-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .btn-submit {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-submit:hover { background: var(--accent-hover); }
+  .btn-submit:disabled {
+    background: var(--btn-disabled);
+    cursor: not-allowed;
+  }
+
+  .status-label {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .status-label.running { color: var(--warning); font-weight: 600; }
+  .status-label.error { color: var(--error); font-weight: 600; }
+
+  /* History */
+  .history-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .history-panel h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 16px 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .history-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s;
+  }
+  .history-item:hover { background: var(--bg); }
+  .history-item.selected {
+    background: var(--selected-bg);
+    border-left-color: var(--accent);
+  }
+  .history-item .req-label {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .history-item .req-text {
+    color: var(--text-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  .token-info {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+
+  .slide-children {
+    padding-left: 20px;
+  }
+  .slide-child {
+    padding: 4px 16px 4px 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .slide-child:hover { color: var(--text); }
+  .slide-child.selected { color: var(--accent); font-weight: 600; }
+  .slide-child.unchanged { opacity: 0.45; }
+  .slide-child.unchanged .no-change-tag {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+
+  /* History filter toggle */
+  .history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px 4px;
+  }
+  .history-header h3 {
+    padding: 0;
+  }
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--text-muted);
+    user-select: none;
+  }
+  .filter-toggle input { margin: 0; cursor: pointer; }
+
+  /* Status icons */
+  .icon-pending::before { content: "\25CB"; color: var(--text-muted); }
+  .icon-running::before { content: "\25D4"; color: var(--warning); }
+  .icon-done::before { content: "\2714"; color: var(--success); }
+  .icon-error::before { content: "\2718"; color: var(--error); }
+  .icon-skipped::before { content: "\25CB"; color: var(--text-muted); }
+  .icon-aborted::before { content: "\26A0"; color: var(--warn-text); }
+  .icon-rolled_back::before { content: "\21A9"; color: var(--purple); }
+  .icon-partial::before { content: "\25D4"; color: var(--purple); }
+
+  /* Reverted request strikethrough */
+  .history-item.reverted .req-label { opacity: 0.5; }
+  .history-item.reverted .req-text {
+    text-decoration: line-through;
+    opacity: 0.45;
+  }
+
+  /* Request-level action buttons */
+  .req-actions {
+    display: inline-flex;
+    gap: 2px;
+    margin-left: auto;
+  }
+  .req-actions .btn-action-sm {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .history-item:hover .req-actions .btn-action-sm { opacity: 1; }
+
+  /* Collapsible slide children */
+  .slide-children.collapsed { display: none; }
+  .req-toggle {
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--text-muted);
+    user-select: none;
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+    transition: transform 0.15s;
+  }
+
+  /* Abort button */
+  .btn-abort {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--warn-text);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-abort:hover { background: var(--warn-bg); border-color: var(--warn-text); }
+
+  /* Rollback buttons */
+  .btn-rollback {
+    background: var(--purple-bg);
+    border: 1px solid var(--purple-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    line-height: 1;
+    color: var(--purple-text);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-rollback:hover { background: var(--purple-bg); }
+  .slide-child-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .slide-child:hover .slide-child-actions { opacity: 1; }
+  .btn-action-sm {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1;
+  }
+  .btn-action-sm.revert { color: var(--purple); }
+  .btn-action-sm.revert:hover { background: var(--purple-bg); border-color: var(--purple-border); }
+  .btn-action-sm.retry { color: var(--accent-hover); }
+  .btn-action-sm.retry:hover { background: var(--accent-soft); border-color: var(--accent-soft-border); }
+
+  /* Viewer header action buttons */
+  .btn-retry {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    line-height: 1;
+    color: var(--accent-hover);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-retry:hover { background: var(--accent-soft); }
+
+  /* Content area */
+  .content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Slide viewer */
+  .slide-viewer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--panel-bg);
+    margin: 12px 12px 0 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .viewer-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .viewer-title { font-size: 14px; font-weight: 600; }
+  .viewer-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .viewer-nav button {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .viewer-nav button:hover { background: var(--hover-bg); }
+  .viewer-nav button:disabled { opacity: 0.4; cursor: default; }
+  .viewer-nav .nav-label { font-size: 12px; color: var(--text-muted); min-width: 100px; text-align: center; }
+
+  .viewer-images {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+  }
+  .image-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 100%;
+    overflow: hidden;
+  }
+  .image-box .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .image-box img {
+    max-width: 100%;
+    max-height: calc(100% - 24px);
+    object-fit: contain;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--img-bg);
+  }
+  .image-box .placeholder {
+    width: 100%;
+    height: 200px;
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* Log panel */
+  .log-panel {
+    margin: 8px 12px 12px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.3s ease;
+  }
+  .log-panel.collapsed { height: 36px !important; }
+
+  .log-header {
+    background: var(--log-header-bg);
+    color: var(--log-header-text);
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .log-header:hover { background: var(--log-header-hover); }
+  .log-header .toggle { font-size: 10px; }
+
+  .log-body {
+    background: var(--log-bg);
+    color: var(--log-text);
+    font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 8px 14px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+  .log-line { white-space: pre-wrap; word-break: break-all; }
+  .log-line .level-ERROR { color: #f38ba8; }
+  .log-line .level-WARNING { color: #fab387; }
+  .log-line .level-INFO { color: #89b4fa; }
+  .log-line .level-DEBUG { color: #6c7086; }
+
+  /* Bug report icon in header */
+  .btn-report-icon {
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .btn-report-icon:hover { background: var(--bg); }
+  .btn-report-icon svg { width: 20px; height: 20px; color: var(--text-muted); }
+  .btn-report-icon:hover svg { color: var(--text); }
+
+  /* Help icon in header */
+  .btn-help-icon {
+    margin-left: auto;
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .btn-help-icon:hover { background: var(--bg); }
+  .btn-help-icon svg { width: 20px; height: 20px; color: var(--text-muted); }
+  .btn-help-icon:hover svg { color: var(--text); }
+
+  /* How to Use modal */
+  .howto-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .howto-modal {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    padding: 32px 36px;
+    width: 680px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px var(--shadow-lg);
+    line-height: 1.6;
+  }
+  .howto-modal h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .howto-modal h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 20px 0 8px 0;
+    color: var(--text);
+  }
+  .howto-modal h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0 6px 0;
+    color: var(--text);
+  }
+  .howto-modal p {
+    font-size: 13px;
+    margin: 6px 0;
+    color: var(--text);
+  }
+  .howto-modal ul, .howto-modal ol {
+    font-size: 13px;
+    padding-left: 20px;
+    margin: 6px 0;
+  }
+  .howto-modal li { margin: 4px 0; }
+  .howto-modal code {
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: "SF Mono", "Consolas", monospace;
+  }
+  .howto-modal table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  .howto-modal th, .howto-modal td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+  }
+  .howto-modal th {
+    background: var(--bg);
+    font-weight: 600;
+  }
+  .howto-modal .howto-note {
+    background: var(--note-bg);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    margin: 8px 0;
+    color: var(--note-text);
+  }
+  .howto-modal .howto-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    background: var(--modal-bg);
+    padding-bottom: 4px;
+    z-index: 1;
+  }
+  .howto-modal .lang-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .howto-modal .lang-toggle button {
+    border: none;
+    background: none;
+    padding: 3px 10px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .howto-modal .lang-toggle button.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .howto-modal .howto-close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .howto-modal .howto-close-btn:hover { color: var(--text); }
+  .howto-modal hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+  }
+
+  /* Update complete modal */
+  .update-complete-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .update-complete-modal {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    padding: 28px 32px;
+    width: 540px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 30px var(--shadow-lg);
+  }
+  .update-complete-modal .uc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .update-complete-modal .uc-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .update-complete-modal .uc-header .uc-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .update-complete-modal .uc-header .uc-close:hover { color: var(--text); }
+  .update-complete-modal .uc-body {
+    overflow-y: auto;
+    line-height: 1.65;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .update-complete-modal .uc-body h1 { font-size: 17px; margin: 16px 0 8px; }
+  .update-complete-modal .uc-body h2 { font-size: 15px; margin: 14px 0 6px; }
+  .update-complete-modal .uc-body h3 { font-size: 14px; margin: 12px 0 6px; }
+  .update-complete-modal .uc-body p { margin: 6px 0; }
+  .update-complete-modal .uc-body ul, .update-complete-modal .uc-body ol {
+    padding-left: 20px;
+    margin: 6px 0;
+  }
+  .update-complete-modal .uc-body li { margin: 3px 0; }
+  .update-complete-modal .uc-body code {
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: "SF Mono", "Consolas", monospace;
+  }
+  .update-complete-modal .uc-body blockquote {
+    border-left: 3px solid var(--border);
+    margin: 8px 0;
+    padding: 4px 12px;
+    color: var(--text-muted);
+  }
+
+  /* Bug report modal */
+  .bugreport-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bugreport-modal {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    padding: 28px 32px;
+    width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px var(--shadow-lg);
+  }
+  .bugreport-modal h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .bugreport-modal label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .bugreport-modal input[type="text"],
+  .bugreport-modal select,
+  .bugreport-modal textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .bugreport-modal input:focus,
+  .bugreport-modal select:focus,
+  .bugreport-modal textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+  .bugreport-modal textarea { resize: vertical; height: 100px; }
+  .bugreport-modal .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .bugreport-modal .checkbox-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+  }
+  .bugreport-modal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .bugreport-modal .btn-modal {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .bugreport-modal .btn-modal.submit {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .bugreport-modal .btn-modal.submit:hover { background: var(--accent-hover); }
+  .bugreport-modal .btn-modal.submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .bugreport-modal .btn-modal.cancel {
+    background: var(--bg);
+    color: var(--text);
+  }
+  .bugreport-modal .btn-modal.cancel:hover { background: var(--hover-bg); }
+  .bugreport-modal .submit-status {
+    margin-top: 12px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .bugreport-modal .submit-status.error { color: var(--error); }
+  .bugreport-modal .submit-status.success { color: var(--success); }
+  .bugreport-modal .spinner-inline {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  /* Token usage icon in header */
+  .token-usage-wrapper {
+    position: relative;
+  }
+  .btn-token-icon {
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .btn-token-icon:hover { background: var(--bg); }
+  .btn-token-icon svg { width: 20px; height: 20px; color: var(--text-muted); }
+  .btn-token-icon:hover svg { color: var(--text); }
+  .btn-token-icon .token-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 8px;
+    line-height: 1.2;
+    display: none;
+  }
+  .btn-token-icon .token-badge.visible { display: block; }
+
+  .token-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px var(--shadow);
+    padding: 16px 20px;
+    min-width: 260px;
+    z-index: 100;
+    font-size: 13px;
+  }
+  .token-popup.visible { display: block; }
+  .token-popup h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .token-popup .tp-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    color: var(--text-muted);
+  }
+  .token-popup .tp-row .tp-val { color: var(--text); font-weight: 600; }
+  .token-popup .tp-divider {
+    border-top: 1px solid var(--border);
+    margin: 8px 0;
+  }
+  .token-popup .tp-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  /* Close button in header */
+  .btn-close-file {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--danger-text);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .btn-close-file:hover { background: var(--danger-hover-bg); border-color: var(--danger-hover-border); color: var(--danger-hover-text); }
+
+  /* Shutdown button in header */
+  .btn-shutdown {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+  }
+  .btn-shutdown svg { width: 18px; height: 18px; }
+  .btn-shutdown:hover { color: var(--error); background: var(--danger-bg); }
+
+  /* Upload section */
+  .upload-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
+  .upload-card {
+    text-align: center;
+  }
+  .upload-branding {
+    margin-bottom: 32px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px var(--shadow);
+    padding: 32px 40px;
+  }
+  .upload-branding .brand-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .upload-branding .brand-version {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .upload-branding .brand-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .upload-branding .brand-author {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .upload-box {
+    width: 480px;
+    padding: 48px;
+    background: var(--panel-bg);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-box.dragover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .upload-box h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .upload-box p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .upload-box .btn-browse {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .upload-box .btn-browse:hover { background: var(--accent-hover); }
+  .upload-box .btn-browse:disabled { background: var(--btn-disabled); cursor: not-allowed; }
+  .upload-spinner {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: none;
+  }
+  .upload-spinner.visible { display: block; }
+  .upload-error {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--error);
+    display: none;
+  }
+  .upload-error.visible { display: block; }
+
+  /* API Settings button */
+  .btn-api-settings {
+    margin-top: 16px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .btn-api-settings:hover {
+    color: var(--text);
+    background: var(--code-bg);
+  }
+  .btn-api-settings svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  /* API Settings modal */
+  .apisettings-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .apisettings-modal {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    padding: 28px 32px;
+    width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px var(--shadow-lg);
+  }
+  .apisettings-modal h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .apisettings-modal .key-field {
+    margin-bottom: 14px;
+  }
+  .apisettings-modal .key-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text);
+  }
+  .apisettings-modal .key-label .key-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 4px;
+  }
+  .apisettings-modal .key-badge.set {
+    background: var(--accent-soft);
+    color: var(--success);
+  }
+  .apisettings-modal .key-badge.missing {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+  }
+  .apisettings-modal .key-badge.optional {
+    background: var(--code-bg);
+    color: var(--text-muted);
+  }
+  .apisettings-modal .key-input-wrap {
+    position: relative;
+    display: flex;
+  }
+  .apisettings-modal .key-input-wrap input {
+    flex: 1;
+    padding: 8px 36px 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .apisettings-modal .key-input-wrap input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+  .apisettings-modal .btn-toggle-vis {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .apisettings-modal .btn-toggle-vis:hover { color: var(--text); }
+  .apisettings-modal .key-section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin: 20px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .apisettings-modal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  .apisettings-modal .btn-modal {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .apisettings-modal .btn-modal.submit {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .apisettings-modal .btn-modal.submit:hover { background: var(--accent-hover); }
+  .apisettings-modal .btn-modal.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .apisettings-modal .btn-modal.cancel {
+    background: var(--bg);
+    color: var(--text);
+  }
+  .apisettings-modal .btn-modal.cancel:hover { background: var(--hover-bg); }
+  .apisettings-modal .submit-status {
+    margin-top: 12px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .apisettings-modal .submit-status.error { color: var(--error); }
+  .apisettings-modal .submit-status.success { color: var(--success); }
+
+  /* Close modal */
+  .close-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .close-modal {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    padding: 28px 32px;
+    width: 400px;
+    box-shadow: 0 8px 30px var(--shadow-lg);
+    text-align: center;
+  }
+  .close-modal h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .close-modal p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .close-modal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .close-modal .btn-modal {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .close-modal .btn-modal.save {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .close-modal .btn-modal.save:hover {
+    background: var(--accent-hover);
+  }
+  .close-modal .btn-modal.discard {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border-color: var(--danger-border);
+  }
+  .close-modal .btn-modal.discard:hover {
+    background: var(--danger-hover-bg);
+    border-color: var(--danger-hover-border);
+  }
+  .close-modal .btn-modal.save-as {
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    border-color: var(--accent-soft-border);
+  }
+  .close-modal .btn-modal.save-as:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .close-modal .btn-modal.cancel {
+    background: var(--bg);
+    color: var(--text);
+  }
+  .close-modal .btn-modal.cancel:hover {
+    background: var(--hover-bg);
+  }
+  .close-modal .save-as-input {
+    display: none;
+    margin-top: 16px;
+    gap: 8px;
+    align-items: center;
+  }
+  .close-modal .save-as-input.visible {
+    display: flex;
+  }
+  .close-modal .save-as-input input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+  }
+  .close-modal .save-as-input input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+  .close-modal .save-as-input button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+  }
+  .close-modal .save-as-input button:hover {
+    background: var(--accent-hover);
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .spinner-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  /* Keyboard hint */
+  .kbd-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-align: right;
+  }
+  /* Check Update spin animation */
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  .spin { animation: spin 1s linear infinite; }
+
+  /* Options dropdown in header */
+  .options-wrapper {
+    position: relative;
+  }
+  .btn-options-icon {
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .btn-options-icon:hover { background: var(--bg); }
+  .btn-options-icon svg { width: 20px; height: 20px; color: var(--text-muted); }
+  .btn-options-icon:hover svg { color: var(--text); }
+
+  .options-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px var(--shadow);
+    padding: 12px 16px;
+    min-width: 220px;
+    z-index: 100;
+    font-size: 13px;
+  }
+  .options-popup.visible { display: block; }
+  .options-popup h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .opt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+  .opt-row + .opt-row { border-top: 1px solid var(--border); }
+  .opt-label {
+    font-size: 12px;
+    color: var(--text);
+  }
+  .opt-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  /* Toggle switch */
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--border);
+    border-radius: 20px;
+    transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--panel-bg);
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-slider {
+    background: var(--accent);
+  }
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(16px);
+  }
+  kbd {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-family: inherit;
+  }
+
+  /* Driver.js tour overrides */
+  .driver-popover {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .driver-popover .driver-popover-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .driver-popover .driver-popover-description {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .driver-popover-navigation-btns .driver-popover-next-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    text-shadow: none;
+  }
+  .driver-popover-navigation-btns .driver-popover-next-btn:hover {
+    background: var(--accent-hover);
+  }
+  .driver-popover-navigation-btns .driver-popover-prev-btn {
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    text-shadow: none;
+  }
+  .driver-popover .driver-popover-close-btn {
+    color: var(--text-muted);
+  }
+  .driver-popover-progress-text {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Update banner */
+  .update-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  .update-banner .btn-update {
+    background: #fff;
+    color: #2563eb;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .update-banner .btn-update:hover { background: #e0e7ff; }
+  .update-banner .btn-dismiss {
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .update-banner .btn-dismiss:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* Update progress overlay */
+  .update-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+  .update-modal {
+    background: var(--modal-bg);
+    border-radius: 12px;
+    padding: 36px 48px;
+    text-align: center;
+    min-width: 360px;
+    box-shadow: 0 20px 40px var(--shadow-lg);
+  }
+  .update-modal h3 { font-size: 18px; margin-bottom: 20px; }
+  .update-stage { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+  .update-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .update-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .update-percent { font-size: 13px; color: var(--text-muted); }
+
+  /* Dark mode form element overrides */
+  [data-theme="dark"] input,
+  [data-theme="dark"] textarea,
+  [data-theme="dark"] select {
+    background: var(--code-bg);
+    color: var(--text);
+    border-color: var(--border);
+  }
+  [data-theme="dark"] .upload-box {
+    background: var(--sidebar-bg);
+  }
+  [data-theme="dark"] .howto-modal code {
+    color: var(--text);
+  }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+</head>
+<body>
+
+<!-- Update banner -->
+<div class="update-banner" id="updateBanner">
+  <span id="updateBannerText">New version available!</span>
+  <button class="btn-update" id="btnApplyUpdate" onclick="applyUpdate()">Update</button>
+  <button class="btn-dismiss" onclick="dismissUpdate()">Dismiss</button>
+</div>
+
+<!-- Update progress overlay -->
+<div class="update-overlay" id="updateOverlay">
+  <div class="update-modal">
+    <h3>Updating EditPPT</h3>
+    <div class="update-stage" id="updateStageText">Preparing...</div>
+    <div class="update-progress-bar">
+      <div class="update-progress-fill" id="updateProgressFill"></div>
+    </div>
+    <div class="update-percent" id="updatePercent">0%</div>
+  </div>
+</div>
+
+<!-- Update complete modal (shown after restart) -->
+<div class="update-complete-overlay" id="updateCompleteOverlay" style="display:none"
+     onclick="if(event.target===this)closeUpdateComplete()">
+  <div class="update-complete-modal">
+    <div class="uc-header">
+      <h2 id="updateCompleteTitle">Update Complete</h2>
+      <button class="uc-close" onclick="closeUpdateComplete()">&times;</button>
+    </div>
+    <div class="uc-body" id="updateCompleteBody"></div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>EditPPT</h1><span style="font-size:11px; color:var(--text-muted); font-weight:500;">{{ app_version }}</span>
+  <span class="file-info" id="fileInfo">{% if file_loaded %}{{ prs_name }}{% else %}No file loaded{% endif %}</span>
+  <button class="btn-close-file" id="btnCloseFile" onclick="closeFile()" {% if not file_loaded %}style="display:none"{% endif %}>Close File</button>
+  <button id="btnTour" onclick="startTour()" title="Guided Tour" style="display:inline-flex; align-items:center; gap:5px; background:var(--success); color:#fff; border:none; border-radius:6px; padding:5px 12px 5px 8px; cursor:pointer; font-size:12px; font-weight:600; transition:background 0.15s;"
+    onmouseenter="this.style.background='var(--success-hover)'" onmouseleave="this.style.background='var(--success)'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;">
+      <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+    </svg>
+    Tour Guide
+  </button>
+  <button class="btn-help-icon" id="btnHowToUse" onclick="openHowToUseModal()" title="How to Use">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  </button>
+  <button class="btn-report-icon" id="btnBugReport" onclick="openBugReportModal()" title="Bug Report / Feedback">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+      <line x1="4" y1="22" x2="4" y2="15"></line>
+    </svg>
+  </button>
+  <div class="token-usage-wrapper">
+    <button class="btn-token-icon" id="btnTokenUsage" onclick="toggleTokenPopup()" title="Token Usage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+      <span class="token-badge" id="tokenBadge"></span>
+    </button>
+    <div class="token-popup" id="tokenPopup"></div>
+  </div>
+  <div class="options-wrapper">
+    <button class="btn-options-icon" id="btnOptions" onclick="toggleOptionsPopup()" title="Options">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+    <div class="options-popup" id="optionsPopup">
+      <h4>Options</h4>
+      <div class="opt-row">
+        <div>
+          <div class="opt-label">Auto-resize text</div>
+          <div class="opt-desc">Shrink font to fit text in shape</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chkAutoResize" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="opt-row">
+        <div>
+          <div class="opt-label">Dark mode</div>
+          <div class="opt-desc">Switch to dark theme</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chkDarkMode" onchange="toggleDarkMode(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="opt-divider" style="border-top:1px solid var(--border); margin:8px 0;"></div>
+      <button id="btnCheckUpdate" onclick="manualCheckUpdate()" style="
+        width:100%; display:flex; align-items:center; gap:8px;
+        background:none; border:none; padding:7px 0; cursor:pointer;
+        font-size:12px; color:var(--text); font-family:inherit;
+        transition: color 0.15s;
+      " onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.querySelector('#checkUpdateStatus').style.color && (this.style.color=this.querySelector('#checkUpdateStatus').style.color) || (this.style.color='var(--text)')">
+        <svg id="checkUpdateIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; flex-shrink:0;">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        <span id="checkUpdateStatus">Check for updates</span>
+      </button>
+      <button id="btnWhatsNew" onclick="showWhatsNew()" style="
+        width:100%; display:flex; align-items:center; gap:8px;
+        background:none; border:none; padding:7px 0; cursor:pointer;
+        font-size:12px; color:var(--text); font-family:inherit;
+        transition: color 0.15s;
+      " onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--text)'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; flex-shrink:0;">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>What's new ({{ app_version }})</span>
+      </button>
+    </div>
+  </div>
+  <button class="btn-shutdown" onclick="shutdownServer()" title="Shut down server">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+      <line x1="12" y1="2" x2="12" y2="12"></line>
+    </svg>
+  </button>
+</div>
+
+<!-- Upload section (shown when no file loaded) -->
+<div class="upload-section" id="uploadSection" {% if file_loaded %}style="display:none"{% endif %}>
+  <div class="upload-card">
+    <div class="upload-branding">
+      <span class="brand-title">EditPPT</span><span class="brand-version">{{ app_version }}</span>
+      <div class="brand-desc">AI-powered PowerPoint editing agent.<br>Describe your edits in natural language and let AI handle the rest.</div>
+      <div class="brand-author">Developed by Anonymous</div>
+    </div>
+  <div style="margin-bottom:10px; padding:10px 14px; background:var(--upload-warn-bg); border:1px solid var(--upload-warn-border); border-radius:8px; font-size:12px; color:var(--upload-warn-text); line-height:1.7;">
+    <div style="font-weight:700; margin-bottom:4px;">⚠ 주의사항</div>
+    <ol style="margin:0; padding-left:18px;">
+      <li><strong>파일을 열거나 닫을 때 실행 중인 모든 PowerPoint가 강제 종료됩니다.</strong><br>작업 중인 파일이 있다면 반드시 먼저 저장 후 종료하세요.</li>
+      <li>편집 중 과도한 조작 시 프로그램이 비정상 종료될 수 있습니다.</li>
+      <li>수식(Equation) 객체가 포함된 슬라이드에서 화면이 자동 이동될 수 있습니다.</li>
+    </ol>
+  </div>
+  <div class="upload-box" id="uploadBox">
+    <h2>Open a Presentation</h2>
+    <p>Drag &amp; drop a <strong>.pptx</strong> file here, or click to browse</p>
+    <input type="file" id="fileInput" accept=".pptx" style="display:none">
+    <button class="btn-browse" id="btnBrowse" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+    <div class="upload-spinner" id="uploadSpinner"><span class="spinner-icon"></span> Initializing PowerPoint...</div>
+    <div class="upload-error" id="uploadError"></div>
+  </div>
+  <button class="btn-api-settings" onclick="openApiSettingsModal()">
+    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.611 3.611 0 0112 15.6z"/></svg>
+    API Key Settings
+  </button>
+  </div>
+</div>
+
+<!-- Main layout (hidden until file loaded) -->
+<div class="main-layout" id="editSection" {% if not file_loaded %}style="display:none"{% endif %}>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="input-area">
+      <textarea id="userInput" placeholder="Describe your edit request..." rows="4"></textarea>
+      <div class="btn-row">
+        <button class="btn-submit" id="btnSubmit" onclick="submitRequest()">Submit</button>
+        <button class="btn-abort" id="btnAbort" onclick="abortRequest()" style="display:none">Abort</button>
+        <span class="status-label" id="statusLabel">Ready</span>
+      </div>
+      <div class="kbd-hint"><kbd>Enter</kbd> submit · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline</div>
+    </div>
+    <div class="history-panel">
+      <div class="history-header">
+        <h3>History</h3>
+        <label class="filter-toggle">
+          <input type="checkbox" id="filterChanged" onchange="toggleFilterChanged()">
+          Changed only
+        </label>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+
+    <!-- Slide viewer -->
+    <div class="slide-viewer" id="slideViewer">
+      <div class="viewer-header" id="viewerHeader" style="display:none;">
+        <span class="viewer-title" id="viewerTitle"></span>
+        <div class="viewer-nav">
+          <button id="btnPrev" onclick="navSlide(-1)">&larr;</button>
+          <span class="nav-label" id="navLabel"></span>
+          <button id="btnNext" onclick="navSlide(1)">&rarr;</button>
+        </div>
+      </div>
+      <div id="viewerBody">
+        <div class="empty-state">Submit a request to see before/after slide comparisons</div>
+      </div>
+    </div>
+
+    <!-- Log panel -->
+    <div class="log-panel" id="logPanel" style="height: 240px;">
+      <div class="log-header" onclick="toggleLog()">
+        <span id="logHeaderText">Log Output</span>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <button id="btnLogAll" onclick="event.stopPropagation(); toggleAllLogs();" style="background:var(--log-header-bg); border:1px solid var(--border); border-radius:3px; color:var(--log-header-text); font-size:10px; padding:1px 8px; cursor:pointer; display:none;">All</button>
+          <span class="toggle" id="logToggle">&#9660;</span>
+        </span>
+      </div>
+      <div class="log-body" id="logBody"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============= Dark Mode =============
+function toggleDarkMode(enabled) {
+  document.documentElement.setAttribute("data-theme", enabled ? "dark" : "light");
+  localStorage.setItem("editppt-theme", enabled ? "dark" : "light");
+}
+(function initTheme() {
+  const saved = localStorage.getItem("editppt-theme");
+  if (saved === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    // checkbox will be synced in DOMContentLoaded
+  }
+})();
+
+// ============= State =============
+let historyData = [];
+let selectedRequestId = null;
+let selectedSlideIdx = 0; // index within slide_edits array
+let collapsedRequests = new Set();
+let logEntries = []; // [{text, request_id, slide_index}]
+let showAllLogs = false;
+let filterChangedOnly = false;
+
+// ============= SSE =============
+const evtSource = new EventSource("/api/stream");
+
+evtSource.addEventListener("log", (e) => {
+  const data = JSON.parse(e.data);
+  pushLog(data);
+});
+
+evtSource.addEventListener("request_update", (e) => {
+  const rec = JSON.parse(e.data);
+  upsertHistory(rec);
+  renderHistory();
+  updateStatus(rec);
+  updateTokenButton();
+  if (selectedRequestId === rec.request_id) {
+    renderViewer();
+  }
+});
+
+evtSource.addEventListener("slide_update", (e) => {
+  const data = JSON.parse(e.data);
+  // Update in-memory
+  const rec = historyData.find(r => r.request_id === data.request_id);
+  if (rec) {
+    const se = rec.slide_edits.find(s => s.slide_index === data.slide_index);
+    if (se) {
+      if (data.before_image) se.before_image = data.before_image;
+      if (data.after_image) se.after_image = data.after_image;
+    }
+  }
+  if (selectedRequestId === data.request_id) {
+    renderViewer();
+  }
+});
+
+evtSource.addEventListener("update_available", (e) => {
+  const data = JSON.parse(e.data);
+  showUpdateBanner(data.current, data.latest);
+});
+
+// Also check on page load (SSE might miss the startup broadcast)
+fetch("/api/check-update").then(r => r.json()).then(data => {
+  if (data.has_update) showUpdateBanner(data.current_version, data.latest_version);
+}).catch(() => {});
+
+function showUpdateBanner(current, latest) {
+  document.getElementById("updateBannerText").textContent =
+    `New version ${latest} available (current: ${current})`;
+  document.getElementById("updateBanner").style.display = "flex";
+}
+
+evtSource.addEventListener("update_progress", (e) => {
+  const data = JSON.parse(e.data);
+  const overlay = document.getElementById("updateOverlay");
+  overlay.style.display = "flex";
+  const stageLabels = {
+    downloading: "Downloading update...",
+    verifying: "Verifying download integrity...",
+    extracting: "Extracting files...",
+    installing: "Installing update...",
+    restarting: "Restarting application..."
+  };
+  document.getElementById("updateStageText").textContent = stageLabels[data.stage] || data.stage;
+  if (data.percent !== undefined) {
+    document.getElementById("updateProgressFill").style.width = data.percent + "%";
+    document.getElementById("updatePercent").textContent = data.percent + "%";
+  }
+});
+
+evtSource.addEventListener("update_error", (e) => {
+  const data = JSON.parse(e.data);
+  document.getElementById("updateOverlay").style.display = "none";
+  alert("Update failed: " + data.error);
+});
+
+evtSource.addEventListener("update_failed_previous", (e) => {
+  const data = JSON.parse(e.data);
+  alert("Previous update failed. Please try updating again manually.\n\nReason: " + data.reason);
+});
+
+evtSource.addEventListener("update_complete", (e) => {
+  const data = JSON.parse(e.data);
+  document.getElementById("updateCompleteTitle").textContent =
+    `Updated to ${data.version}`;
+  document.getElementById("updateCompleteBody").innerHTML =
+    simpleMarkdown(data.release_notes || "No release notes.");
+  document.getElementById("updateCompleteOverlay").style.display = "flex";
+});
+
+function closeUpdateComplete() {
+  document.getElementById("updateCompleteOverlay").style.display = "none";
+}
+
+function simpleMarkdown(md) {
+  // Minimal markdown → HTML converter for release notes
+  const esc = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const lines = md.split("\n");
+  let html = "";
+  let inUl = false, inOl = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Headings
+    const hMatch = line.match(/^(#{1,3})\s+(.*)/);
+    if (hMatch) {
+      if (inUl) { html += "</ul>"; inUl = false; }
+      if (inOl) { html += "</ol>"; inOl = false; }
+      const level = hMatch[1].length;
+      html += `<h${level}>${esc(hMatch[2])}</h${level}>`;
+      continue;
+    }
+
+    // Unordered list
+    const ulMatch = line.match(/^[\s]*[-*]\s+(.*)/);
+    if (ulMatch) {
+      if (inOl) { html += "</ol>"; inOl = false; }
+      if (!inUl) { html += "<ul>"; inUl = true; }
+      html += `<li>${inlineMarkdown(esc(ulMatch[1]))}</li>`;
+      continue;
+    }
+
+    // Ordered list
+    const olMatch = line.match(/^[\s]*\d+[.)]\s+(.*)/);
+    if (olMatch) {
+      if (inUl) { html += "</ul>"; inUl = false; }
+      if (!inOl) { html += "<ol>"; inOl = true; }
+      html += `<li>${inlineMarkdown(esc(olMatch[1]))}</li>`;
+      continue;
+    }
+
+    // Close open lists
+    if (inUl) { html += "</ul>"; inUl = false; }
+    if (inOl) { html += "</ol>"; inOl = false; }
+
+    // Blank line
+    if (!line.trim()) continue;
+
+    // Paragraph
+    html += `<p>${inlineMarkdown(esc(line))}</p>`;
+  }
+
+  if (inUl) html += "</ul>";
+  if (inOl) html += "</ol>";
+  return html;
+}
+
+function inlineMarkdown(s) {
+  return s
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+evtSource.onerror = () => {
+  const overlay = document.getElementById("updateOverlay");
+  if (overlay.style.display === "flex") {
+    // Server died during update — wait for new server to come up, then reload
+    document.getElementById("updateStageText").textContent = "Waiting for restart...";
+    const checkInterval = setInterval(async () => {
+      try {
+        const resp = await fetch("/api/check-update");
+        if (resp.ok) {
+          clearInterval(checkInterval);
+          window.location.reload();
+        }
+      } catch (_) {}
+    }, 2000);
+  } else {
+    appendLog("SSE connection lost. Refresh the page to reconnect.");
+  }
+};
+
+// ============= Submit =============
+async function submitRequest() {
+  const input = document.getElementById("userInput").value.trim();
+  if (!input) return;
+
+  const btn = document.getElementById("btnSubmit");
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch("/api/submit", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({user_input: input, auto_resize: document.getElementById("chkAutoResize").checked}),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      document.getElementById("userInput").value = "";
+      selectedRequestId = data.request_id;
+      selectedSlideIdx = 0;
+    } else {
+      appendLog("ERROR: " + (data.error || "Request failed"));
+      btn.disabled = false;
+    }
+  } catch (err) {
+    appendLog("ERROR: " + err.message);
+    btn.disabled = false;
+  }
+}
+
+// Enter to submit, Shift+Enter for newline
+document.getElementById("userInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    submitRequest();
+  }
+});
+
+// ============= History =============
+function upsertHistory(rec) {
+  const idx = historyData.findIndex(r => r.request_id === rec.request_id);
+  if (idx >= 0) {
+    historyData[idx] = rec;
+  } else {
+    historyData.push(rec);
+  }
+}
+
+function updateStatus(rec) {
+  const label = document.getElementById("statusLabel");
+  const btn = document.getElementById("btnSubmit");
+  const abortBtn = document.getElementById("btnAbort");
+
+  if (rec.status === "running") {
+    label.textContent = "Processing #" + rec.request_id + "...";
+    label.className = "status-label running";
+    btn.disabled = true;
+    abortBtn.style.display = "";
+  } else if (rec.status === "done" || rec.status === "aborted") {
+    label.textContent = rec.status === "aborted" ? "Aborted #" + rec.request_id : "Ready";
+    label.className = rec.status === "aborted" ? "status-label error" : "status-label";
+    btn.disabled = false;
+    abortBtn.style.display = "none";
+  } else if (rec.status === "error") {
+    label.textContent = "Error on #" + rec.request_id;
+    label.className = "status-label error";
+    btn.disabled = false;
+    abortBtn.style.display = "none";
+  } else if (rec.status === "rolled_back" || rec.status === "partial") {
+    label.textContent = "Ready";
+    label.className = "status-label";
+    btn.disabled = false;
+    abortBtn.style.display = "none";
+  }
+}
+
+function renderHistory() {
+  const el = document.getElementById("historyList");
+  el.innerHTML = "";
+
+  for (const rec of historyData.slice().reverse()) {
+    const isReverted = rec.status === "rolled_back";
+    const item = document.createElement("div");
+    item.className = "history-item"
+      + (selectedRequestId === rec.request_id ? " selected" : "")
+      + (isReverted ? " reverted" : "");
+    item.onclick = () => { selectRequest(rec.request_id); };
+
+    const iconClass = "icon-" + rec.status;
+    const isCollapsed = collapsedRequests.has(rec.request_id);
+    const toggleArrow = isCollapsed ? "\u25B6" : "\u25BC";
+
+    // Request-level Revert/Retry buttons
+    const canReqAct = (rec.status === "done" || rec.status === "error") &&
+      rec.slide_edits && rec.slide_edits.length > 0 && rec.slide_edits[0].has_checkpoint;
+    let reqActionBtns = "";
+    if (canReqAct) {
+      reqActionBtns = `<span class="req-actions">` +
+        `<button class="btn-action-sm revert" title="Revert entire request" onclick="event.stopPropagation(); rollbackRequest(${rec.request_id})">&#x21A9;</button>` +
+        `<button class="btn-action-sm retry" title="Retry entire request" onclick="event.stopPropagation(); retryRequest(${rec.request_id})">&#x21BB;</button>` +
+        `</span>`;
+    }
+
+    const totalTok = (rec.total_input_tokens || 0) + (rec.total_output_tokens || 0);
+    const tokStr = totalTok > 0
+      ? `<span class="token-info">&middot; ${totalTok >= 1000 ? (totalTok / 1000).toFixed(1) + 'k' : totalTok} tok</span>`
+      : '';
+
+    item.innerHTML = `
+      <div class="req-label">
+        <span class="req-toggle" data-rid="${rec.request_id}">${toggleArrow}</span>
+        <span class="${iconClass}"></span> #${rec.request_id}
+        ${tokStr}
+        ${reqActionBtns}
+      </div>
+      <div class="req-text">${escHtml(rec.user_input)}</div>
+    `;
+
+    // Toggle click handler
+    const toggleEl = item.querySelector(".req-toggle");
+    toggleEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (collapsedRequests.has(rec.request_id)) {
+        collapsedRequests.delete(rec.request_id);
+      } else {
+        collapsedRequests.add(rec.request_id);
+      }
+      renderHistory();
+    });
+
+    // Slide children
+    if (rec.slide_edits && rec.slide_edits.length > 0) {
+      const children = document.createElement("div");
+      children.className = "slide-children" + (isCollapsed ? " collapsed" : "");
+      rec.slide_edits.forEach((se, i) => {
+        const isUnchanged = se.status === "done" && se.changed === false;
+
+        // Skip unchanged slides when filter is on
+        if (filterChangedOnly && isUnchanged) return;
+
+        const child = document.createElement("div");
+        child.className = "slide-child" +
+          (selectedRequestId === rec.request_id && selectedSlideIdx === i ? " selected" : "") +
+          (isUnchanged ? " unchanged" : "");
+        const sIcon = "icon-" + se.status;
+        const canAct = se.status === "done" || se.status === "error" || se.status === "rolled_back";
+        const hasTask = !!se.has_task;
+        const hasCkpt = !!se.has_checkpoint;
+        let actionBtns = "";
+        if (canAct) {
+          const revertBtn = hasCkpt
+            ? `<button class="btn-action-sm revert" title="Revert" onclick="event.stopPropagation(); rollbackSlide(${rec.request_id}, ${i})">&#x21A9;</button>`
+            : "";
+          const retryBtn = hasTask
+            ? `<button class="btn-action-sm retry" title="Retry" onclick="event.stopPropagation(); retrySlide(${rec.request_id}, ${i})">&#x21BB;</button>`
+            : "";
+          actionBtns = `<span class="slide-child-actions">${revertBtn}${retryBtn}</span>`;
+        }
+        const noChangeTag = isUnchanged ? '<span class="no-change-tag">No change</span>' : '';
+        child.innerHTML = `<span class="${sIcon}"></span> Slide ${se.slide_index}${noChangeTag}${actionBtns}`;
+        child.onclick = (e) => {
+          e.stopPropagation();
+          selectedRequestId = rec.request_id;
+          selectedSlideIdx = i;
+          showAllLogs = false;
+          renderHistory();
+          renderViewer();
+          renderLogs();
+        };
+        children.appendChild(child);
+      });
+      item.appendChild(children);
+    }
+
+    el.appendChild(item);
+  }
+}
+
+function toggleFilterChanged() {
+  filterChangedOnly = document.getElementById("filterChanged").checked;
+  renderHistory();
+}
+
+function selectRequest(rid) {
+  selectedRequestId = rid;
+  selectedSlideIdx = 0;
+  showAllLogs = false;
+  renderHistory();
+  renderViewer();
+  renderLogs();
+}
+
+// ============= Viewer =============
+function renderViewer() {
+  const header = document.getElementById("viewerHeader");
+  const body = document.getElementById("viewerBody");
+
+  const rec = historyData.find(r => r.request_id === selectedRequestId);
+  if (!rec || !rec.slide_edits || rec.slide_edits.length === 0) {
+    header.style.display = "none";
+    body.innerHTML = '<div class="empty-state">No slides to display</div>';
+    return;
+  }
+
+  header.style.display = "flex";
+  const edits = rec.slide_edits;
+  if (selectedSlideIdx >= edits.length) selectedSlideIdx = edits.length - 1;
+  if (selectedSlideIdx < 0) selectedSlideIdx = 0;
+
+  const se = edits[selectedSlideIdx];
+
+  const titleEl = document.getElementById("viewerTitle");
+  titleEl.innerHTML = `#${rec.request_id} ${escHtml(rec.user_input.substring(0, 60))}`;
+
+  // Add action buttons in viewer header
+  const oldRb = document.getElementById("btnRollbackViewer");
+  if (oldRb) oldRb.remove();
+  const oldRt = document.getElementById("btnRetryViewer");
+  if (oldRt) oldRt.remove();
+
+  const canAct = se.status === "done" || se.status === "error" || se.status === "rolled_back";
+  const navEl = document.querySelector(".viewer-nav");
+
+  if (canAct && se.has_checkpoint) {
+    const rb = document.createElement("button");
+    rb.id = "btnRollbackViewer";
+    rb.className = "btn-rollback";
+    rb.title = "Revert";
+    rb.textContent = "\u21A9";
+    rb.onclick = () => rollbackSlide(rec.request_id, selectedSlideIdx);
+    navEl.prepend(rb);
+  }
+  if (canAct && se.has_task) {
+    const rt = document.createElement("button");
+    rt.id = "btnRetryViewer";
+    rt.className = "btn-retry";
+    rt.title = "Retry";
+    rt.textContent = "\u21BB";
+    rt.onclick = () => retrySlide(rec.request_id, selectedSlideIdx);
+    navEl.prepend(rt);
+  }
+
+  document.getElementById("navLabel").textContent =
+    `Slide ${se.slide_index} (${selectedSlideIdx + 1}/${edits.length})`;
+
+  document.getElementById("btnPrev").disabled = selectedSlideIdx <= 0;
+  document.getElementById("btnNext").disabled = selectedSlideIdx >= edits.length - 1;
+
+  const cacheBust = `?t=${Date.now()}`;
+  const beforeHtml = se.before_image
+    ? `<img src="/images/${se.before_image}${cacheBust}" alt="Before">`
+    : '<div class="placeholder">Waiting...</div>';
+  const afterHtml = se.after_image
+    ? `<img src="/images/${se.after_image}${cacheBust}" alt="After">`
+    : '<div class="placeholder">Waiting...</div>';
+
+  body.innerHTML = `
+    <div class="viewer-images">
+      <div class="image-box">
+        <div class="label">Before</div>
+        ${beforeHtml}
+      </div>
+      <div class="image-box">
+        <div class="label">After</div>
+        ${afterHtml}
+      </div>
+    </div>
+  `;
+}
+
+function navSlide(delta) {
+  selectedSlideIdx += delta;
+  renderHistory();
+  renderViewer();
+  renderLogs();
+}
+
+// ============= Log =============
+function makeLogLineHtml(text) {
+  const levelMatch = text.match(/\s+(ERROR|WARNING|INFO|DEBUG)\s/);
+  if (levelMatch) {
+    const lvl = levelMatch[1];
+    const parts = text.split(lvl);
+    return escHtml(parts[0]) +
+      `<span class="level-${lvl}">${lvl}</span>` +
+      escHtml(parts.slice(1).join(lvl));
+  }
+  return escHtml(text);
+}
+
+function pushLog(data) {
+  logEntries.push(data);
+  // Fast path: if the new entry matches the current filter, append instead of full re-render
+  if (logMatchesFilter(data)) {
+    const body = document.getElementById("logBody");
+    const line = document.createElement("div");
+    line.className = "log-line";
+    line.innerHTML = makeLogLineHtml(data.text);
+    body.appendChild(line);
+    if (body.scrollHeight - body.scrollTop - body.clientHeight < 80) {
+      body.scrollTop = body.scrollHeight;
+    }
+  }
+}
+
+function logMatchesFilter(entry) {
+  if (showAllLogs || selectedRequestId === null) return true;
+  if (entry.request_id !== selectedRequestId) return false;
+  // Get the actual slide_index for the selected slide edit
+  const rec = historyData.find(r => r.request_id === selectedRequestId);
+  if (!rec || !rec.slide_edits || rec.slide_edits.length === 0) return true;
+  const currentSlideIndex = rec.slide_edits[selectedSlideIdx]
+    ? rec.slide_edits[selectedSlideIdx].slide_index
+    : null;
+  // request-level logs (slide_index null) always shown for matching request
+  if (entry.slide_index === null || entry.slide_index === undefined) return true;
+  if (currentSlideIndex === null) return true;
+  return entry.slide_index === currentSlideIndex;
+}
+
+function renderLogs() {
+  const body = document.getElementById("logBody");
+  const filtered = logEntries.filter(logMatchesFilter);
+  body.innerHTML = "";
+  for (const entry of filtered) {
+    const line = document.createElement("div");
+    line.className = "log-line";
+    line.innerHTML = makeLogLineHtml(entry.text);
+    body.appendChild(line);
+  }
+  body.scrollTop = body.scrollHeight;
+  updateLogHeader();
+}
+
+function updateLogHeader() {
+  const headerText = document.getElementById("logHeaderText");
+  const btnAll = document.getElementById("btnLogAll");
+  if (!headerText) return;
+  if (showAllLogs || selectedRequestId === null) {
+    headerText.textContent = "Log Output";
+    if (btnAll) btnAll.style.display = selectedRequestId !== null ? "" : "none";
+  } else {
+    const rec = historyData.find(r => r.request_id === selectedRequestId);
+    if (rec && rec.slide_edits && rec.slide_edits.length > 0 && rec.slide_edits[selectedSlideIdx]) {
+      headerText.textContent = "Log Output \u2014 Slide " + rec.slide_edits[selectedSlideIdx].slide_index;
+    } else {
+      headerText.textContent = "Log Output \u2014 Request #" + selectedRequestId;
+    }
+    if (btnAll) btnAll.style.display = "";
+  }
+}
+
+function appendLog(text) {
+  // Legacy helper used by local error messages (no server metadata)
+  pushLog({text: text, request_id: null, slide_index: null});
+}
+
+function toggleLog() {
+  const panel = document.getElementById("logPanel");
+  const toggle = document.getElementById("logToggle");
+  panel.classList.toggle("collapsed");
+  toggle.innerHTML = panel.classList.contains("collapsed") ? "&#9650;" : "&#9660;";
+}
+
+function toggleAllLogs() {
+  showAllLogs = !showAllLogs;
+  const btn = document.getElementById("btnLogAll");
+  if (showAllLogs) {
+    btn.style.background = "var(--log-header-hover)";
+    btn.style.color = "var(--log-text)";
+  } else {
+    btn.style.background = "var(--log-header-bg)";
+    btn.style.color = "var(--log-header-text)";
+  }
+  renderLogs();
+}
+
+// ============= Abort =============
+async function abortRequest() {
+  try {
+    const resp = await fetch("/api/abort", { method: "POST" });
+    const data = await resp.json();
+    if (!resp.ok) {
+      appendLog("Abort error: " + (data.error || "Failed"));
+    }
+  } catch (err) {
+    appendLog("Abort error: " + err.message);
+  }
+}
+
+// ============= Rollback & Retry =============
+async function rollbackSlide(requestId, stepIndex) {
+  const msg = "Reverting this slide will also undo ALL edits made after it " +
+    "(undo-stack semantics). This cannot be undone.\n\nContinue?";
+  if (!confirm(msg)) return;
+
+  try {
+    const resp = await fetch("/api/rollback", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ request_id: requestId, step_index: stepIndex }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      appendLog("Revert error: " + (data.error || "Failed"));
+    } else {
+      appendLog("Revert initiated...");
+    }
+  } catch (err) {
+    appendLog("Revert error: " + err.message);
+  }
+}
+
+async function retrySlide(requestId, stepIndex) {
+  const msg = "Retry will restore the checkpoint (if available) and re-run the edit on this slide. " +
+    "All edits made after this slide will be undone.\n\nContinue?";
+  if (!confirm(msg)) return;
+
+  try {
+    const resp = await fetch("/api/retry", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ request_id: requestId, step_index: stepIndex, auto_resize: document.getElementById("chkAutoResize").checked }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      appendLog("Retry error: " + (data.error || "Failed"));
+    } else {
+      appendLog("Retry initiated...");
+    }
+  } catch (err) {
+    appendLog("Retry error: " + err.message);
+  }
+}
+
+// ============= Request-level Rollback & Retry =============
+async function rollbackRequest(requestId) {
+  const msg = "Reverting this entire request will undo ALL edits from this request " +
+    "and any edits made after it (undo-stack semantics). This cannot be undone.\n\nContinue?";
+  if (!confirm(msg)) return;
+
+  try {
+    const resp = await fetch("/api/rollback-request", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ request_id: requestId }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      appendLog("Revert request error: " + (data.error || "Failed"));
+    } else {
+      appendLog("Reverting request #" + requestId + "...");
+    }
+  } catch (err) {
+    appendLog("Revert request error: " + err.message);
+  }
+}
+
+async function retryRequest(requestId) {
+  const msg = "Retry will revert this entire request to its starting checkpoint, " +
+    "then re-run the same edit as a new request. All subsequent edits will also be undone.\n\nContinue?";
+  if (!confirm(msg)) return;
+
+  try {
+    const resp = await fetch("/api/retry-request", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ request_id: requestId, auto_resize: document.getElementById("chkAutoResize").checked }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      appendLog("Retry request error: " + (data.error || "Failed"));
+    } else {
+      appendLog("Retrying request #" + requestId + "...");
+    }
+  } catch (err) {
+    appendLog("Retry request error: " + err.message);
+  }
+}
+
+// ============= Utils =============
+function escHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ============= Upload =============
+const uploadBox = document.getElementById("uploadBox");
+const fileInput = document.getElementById("fileInput");
+const uploadSpinner = document.getElementById("uploadSpinner");
+const uploadError = document.getElementById("uploadError");
+
+if (uploadBox) {
+  uploadBox.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadBox.classList.add("dragover");
+  });
+  uploadBox.addEventListener("dragleave", () => {
+    uploadBox.classList.remove("dragover");
+  });
+  uploadBox.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadBox.classList.remove("dragover");
+    const files = e.dataTransfer.files;
+    if (files.length > 0) handleUpload(files[0]);
+  });
+}
+
+if (fileInput) {
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) handleUpload(fileInput.files[0]);
+  });
+}
+
+async function handleUpload(file) {
+  if (!file.name.toLowerCase().endsWith(".pptx")) {
+    showUploadError("Only .pptx files are accepted");
+    return;
+  }
+
+  // API 키 설정 여부 확인
+  try {
+    const envResp = await fetch("/api/env-status");
+    const envData = await envResp.json();
+    const anyKeySet = Object.values(envData.keys).some(k => k.set);
+    if (!anyKeySet) {
+      showUploadError("No API keys configured. Please open API Key Settings (🔑) and enter at least one API key before uploading.");
+      return;
+    }
+  } catch (e) { /* proceed if check fails */ }
+
+  uploadError.classList.remove("visible");
+  uploadSpinner.classList.add("visible");
+  document.getElementById("btnBrowse").disabled = true;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const resp = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      showUploadError(data.error || "Upload failed");
+      return;
+    }
+
+    // Success — switch to edit UI
+    document.getElementById("fileInfo").textContent = data.prs_name;
+    document.getElementById("btnCloseFile").style.display = "";
+    document.getElementById("uploadSection").style.display = "none";
+    document.getElementById("editSection").style.display = "flex";
+    // Auto-start edit tour for first-time users after upload
+    if (!localStorage.getItem("editppt_tour_done") && window.driver) {
+      setTimeout(() => startEditTour(), 600);
+    }
+  } catch (err) {
+    showUploadError(err.message);
+  } finally {
+    uploadSpinner.classList.remove("visible");
+    document.getElementById("btnBrowse").disabled = false;
+  }
+}
+
+function showUploadError(msg) {
+  uploadError.textContent = msg;
+  uploadError.classList.add("visible");
+  uploadSpinner.classList.remove("visible");
+  // Reset file input so the same file can be re-selected
+  if (fileInput) fileInput.value = "";
+  document.getElementById("btnBrowse").disabled = false;
+}
+
+// ============= Close File =============
+async function showWhatsNew() {
+  // Close options popup
+  document.getElementById("optionsPopup").classList.remove("visible");
+  document.getElementById("updateCompleteTitle").textContent = "What's new";
+  document.getElementById("updateCompleteBody").innerHTML = "<p style='color:var(--text-muted)'>Loading...</p>";
+  document.getElementById("updateCompleteOverlay").style.display = "flex";
+  try {
+    const resp = await fetch("/api/release-notes");
+    const data = await resp.json();
+    const notes = data.release_notes || "No release notes available for this version.";
+    document.getElementById("updateCompleteTitle").textContent = "What's new in " + data.version;
+    document.getElementById("updateCompleteBody").innerHTML = simpleMarkdown(notes);
+  } catch (e) {
+    document.getElementById("updateCompleteBody").innerHTML = "<p style='color:var(--error)'>Failed to load release notes.</p>";
+  }
+}
+
+async function manualCheckUpdate() {
+  const btn = document.getElementById("btnCheckUpdate");
+  const icon = document.getElementById("checkUpdateIcon");
+  const status = document.getElementById("checkUpdateStatus");
+  btn.disabled = true;
+  icon.classList.add("spin");
+  status.textContent = "Checking...";
+  status.style.color = "";
+  try {
+    const resp = await fetch("/api/check-update");
+    const data = await resp.json();
+    if (data.has_update) {
+      showUpdateBanner(data.current_version, data.latest_version);
+      status.textContent = "Update available! (" + data.latest_version + ")";
+      status.style.color = "var(--accent)";
+      btn.style.color = "var(--accent)";
+    } else {
+      status.textContent = "Up to date (" + data.current_version + ")";
+      status.style.color = "var(--success)";
+      btn.style.color = "var(--success)";
+    }
+  } catch (e) {
+    status.textContent = "Check failed";
+    status.style.color = "var(--error)";
+    btn.style.color = "var(--error)";
+  } finally {
+    icon.classList.remove("spin");
+    setTimeout(() => {
+      btn.disabled = false;
+      status.textContent = "Check for updates";
+      status.style.color = "";
+      btn.style.color = "";
+    }, 3000);
+  }
+}
+
+async function applyUpdate() {
+  if (!confirm("Update will restart the application. Proceed?")) return;
+  document.getElementById("updateOverlay").style.display = "flex";
+  document.getElementById("updateStageText").textContent = "Starting update...";
+  try {
+    const resp = await fetch("/api/apply-update", { method: "POST" });
+    if (!resp.ok) {
+      const data = await resp.json();
+      document.getElementById("updateOverlay").style.display = "none";
+      alert("Update failed: " + (data.error || "Unknown error"));
+    }
+    // If OK, progress will be tracked via SSE events
+  } catch (e) {
+    document.getElementById("updateOverlay").style.display = "none";
+    alert("Update failed: " + e.message);
+  }
+}
+
+function dismissUpdate() {
+  document.getElementById("updateBanner").style.display = "none";
+}
+
+function shutdownServer() {
+  if (!confirm("Are you sure you want to shut down the server?")) return;
+  fetch("/api/shutdown", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+  }).then(() => {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#6b7280;"><div style="text-align:center;"><h2 style="color:#374151;">Server has been shut down.</h2><p>You can close this tab.</p></div></div>';
+  }).catch(() => {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#6b7280;"><div style="text-align:center;"><h2 style="color:#374151;">Server has been shut down.</h2><p>You can close this tab.</p></div></div>';
+  });
+}
+
+function closeFile() {
+  // Show custom modal with Save / Don't Save / Cancel
+  const overlay = document.createElement("div");
+  overlay.className = "close-modal-overlay";
+  overlay.innerHTML = `
+    <div class="close-modal">
+      <h3>Close Presentation</h3>
+      <p>Do you want to save changes before closing?<br>
+         Choosing "Don't Save" will restore the file to its original state.</p>
+      <div class="modal-buttons">
+        <button class="btn-modal save" id="modalSave">Save</button>
+        <button class="btn-modal save-as" id="modalSaveAs">Save As...</button>
+        <button class="btn-modal discard" id="modalDiscard">Don't Save</button>
+        <button class="btn-modal cancel" id="modalCancel">Cancel</button>
+      </div>
+      <div class="save-as-input" id="saveAsInput">
+        <input type="text" id="saveAsFilename" placeholder="new_filename.pptx">
+        <button id="saveAsConfirm">Save</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector("#modalCancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  overlay.querySelector("#modalSave").onclick = async () => {
+    overlay.remove();
+    await doCloseFile(true);
+  };
+  overlay.querySelector("#modalSaveAs").onclick = () => {
+    const inputRow = overlay.querySelector("#saveAsInput");
+    inputRow.classList.toggle("visible");
+    if (inputRow.classList.contains("visible")) {
+      overlay.querySelector("#saveAsFilename").focus();
+    }
+  };
+  overlay.querySelector("#saveAsConfirm").onclick = async () => {
+    const filename = overlay.querySelector("#saveAsFilename").value.trim();
+    if (!filename) { alert("Please enter a filename."); return; }
+    try {
+      const resp = await fetch("/api/save_as", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ filename }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) { alert(data.error || "Save As failed"); return; }
+      alert("Saved as: " + data.saved_path);
+      overlay.remove();
+      await doCloseFile(true);
+    } catch (err) { alert("Error: " + err.message); }
+  };
+  overlay.querySelector("#saveAsFilename").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") overlay.querySelector("#saveAsConfirm").click();
+  });
+  overlay.querySelector("#modalDiscard").onclick = async () => {
+    overlay.remove();
+    await doCloseFile(false);
+  };
+}
+
+async function doCloseFile(save) {
+  try {
+    const resp = await fetch("/api/close", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ save }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      alert(data.error || "Failed to close file");
+      return;
+    }
+  } catch (err) {
+    alert("Error: " + err.message);
+    return;
+  }
+
+  // Reset client state
+  historyData = [];
+  selectedRequestId = null;
+  selectedSlideIdx = 0;
+  collapsedRequests = new Set();
+  logEntries = [];
+  showAllLogs = false;
+  filterChangedOnly = false;
+  document.getElementById("filterChanged").checked = false;
+  document.getElementById("historyList").innerHTML = "";
+  document.getElementById("viewerHeader").style.display = "none";
+  document.getElementById("viewerBody").innerHTML =
+    '<div class="empty-state">Submit a request to see before/after slide comparisons</div>';
+  document.getElementById("logBody").innerHTML = "";
+  updateLogHeader();
+  document.getElementById("statusLabel").textContent = "Ready";
+  document.getElementById("statusLabel").className = "status-label";
+  document.getElementById("btnSubmit").disabled = false;
+  document.getElementById("btnAbort").style.display = "none";
+  document.getElementById("userInput").value = "";
+
+  // Reset token display
+  document.getElementById("tokenBadge").classList.remove("visible");
+  document.getElementById("tokenPopup").classList.remove("visible");
+
+  // Switch UI
+  document.getElementById("fileInfo").textContent = "No file loaded";
+  document.getElementById("btnCloseFile").style.display = "none";
+  document.getElementById("editSection").style.display = "none";
+  document.getElementById("uploadSection").style.display = "flex";
+
+  // Reset file input so same file can be re-selected
+  document.getElementById("fileInput").value = "";
+  uploadError.classList.remove("visible");
+}
+
+// ============= Token Usage =============
+// Cost is computed in Python (editppt/pricing.py) per-call with the correct
+// per-model rates including cached-input discounts, and is sent via
+// total_cost_usd on each request record. The frontend just sums.
+function calcSessionTokens() {
+  let inp = 0, out = 0, cached = 0, cost = 0;
+  for (const rec of historyData) {
+    inp += rec.total_input_tokens || 0;
+    out += rec.total_output_tokens || 0;
+    cached += rec.total_cached_input_tokens || 0;
+    cost += rec.total_cost_usd || 0;
+  }
+  return { input: inp, output: out, cached, total: inp + out, cost };
+}
+
+function formatTok(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + "k";
+  return String(n);
+}
+
+function updateTokenButton() {
+  const badge = document.getElementById("tokenBadge");
+  const { total, cost } = calcSessionTokens();
+  if (total === 0) {
+    badge.classList.remove("visible");
+  } else {
+    badge.textContent = "$" + cost.toFixed(2);
+    badge.classList.add("visible");
+  }
+  // Update popup if visible
+  const popup = document.getElementById("tokenPopup");
+  if (popup.classList.contains("visible")) renderTokenPopup();
+}
+
+function toggleTokenPopup() {
+  const popup = document.getElementById("tokenPopup");
+  if (popup.classList.contains("visible")) {
+    popup.classList.remove("visible");
+  } else {
+    renderTokenPopup();
+    popup.classList.add("visible");
+  }
+}
+
+function renderTokenPopup() {
+  const { input, output, cached, total, cost } = calcSessionTokens();
+  const popup = document.getElementById("tokenPopup");
+  const cachedPct = input > 0 ? ((cached / input) * 100).toFixed(1) : "0.0";
+  popup.innerHTML = `
+    <h4>Session Token Usage</h4>
+    <div class="tp-row"><span>Input tokens</span><span class="tp-val">${formatTok(input)}</span></div>
+    <div class="tp-row"><span>&nbsp;&nbsp;of which cached</span><span class="tp-val">${formatTok(cached)} (${cachedPct}%)</span></div>
+    <div class="tp-row"><span>Output tokens</span><span class="tp-val">${formatTok(output)}</span></div>
+    <div class="tp-divider"></div>
+    <div class="tp-row"><span>Total tokens</span><span class="tp-val">${formatTok(total)}</span></div>
+    <div class="tp-divider"></div>
+    <div class="tp-total"><span>Total cost</span><span>$${cost.toFixed(4)}</span></div>
+  `;
+}
+
+// ============= Options popup =============
+function toggleOptionsPopup() {
+  const popup = document.getElementById("optionsPopup");
+  popup.classList.toggle("visible");
+}
+
+// Close popups when clicking outside
+document.addEventListener("click", (e) => {
+  const tokenWrapper = document.querySelector(".token-usage-wrapper");
+  if (tokenWrapper && !tokenWrapper.contains(e.target)) {
+    document.getElementById("tokenPopup").classList.remove("visible");
+  }
+  const optWrapper = document.querySelector(".options-wrapper");
+  if (optWrapper && !optWrapper.contains(e.target)) {
+    document.getElementById("optionsPopup").classList.remove("visible");
+  }
+});
+
+// ============= Bug Report / Feedback =============
+// ============= API Key Settings =============
+const API_KEY_DEFS = [
+  { key: "OPENAI_API_KEY",      label: "OpenAI API Key",      required: true },
+  { key: "GEMINI_API_KEY",      label: "Gemini API Key (Vision Validation, Image Generation)",  required: false },
+  { key: "PEXELS_API_KEY",      label: "Pexels API Key (Image Search)",      required: false },
+  { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash Access Key (Image Search Fallback)", required: false },
+];
+
+async function openApiSettingsModal() {
+  // Fetch current status
+  let keyStatus = {};
+  try {
+    const resp = await fetch("/api/env-status");
+    const data = await resp.json();
+    keyStatus = data.keys || {};
+  } catch (e) {
+    console.error("Failed to fetch env status", e);
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "apisettings-overlay";
+
+  const requiredFields = API_KEY_DEFS.filter(d => d.required);
+  const optionalFields = API_KEY_DEFS.filter(d => !d.required);
+
+  function renderFields(defs) {
+    return defs.map(d => {
+      const info = keyStatus[d.key] || { set: false, preview: "" };
+      const badgeClass = info.set ? "set" : (d.required ? "missing" : "optional");
+      const badgeText = info.set ? "Configured" : (d.required ? "Required" : "Not set");
+      return `
+        <div class="key-field">
+          <div class="key-label">
+            <span>${d.label}</span>
+            <span class="key-badge ${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" id="apikey_${d.key}" placeholder="${info.preview || d.key}" autocomplete="off" spellcheck="false">
+            <button class="btn-toggle-vis" type="button" onclick="toggleKeyVis(this)" title="Show/Hide">&#128065;</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  overlay.innerHTML = `
+    <div class="apisettings-modal">
+      <h3>API Key Settings</h3>
+      <div class="key-section-label">Required</div>
+      ${renderFields(requiredFields)}
+      <div class="key-section-label">Optional</div>
+      ${renderFields(optionalFields)}
+      <div class="modal-buttons">
+        <button class="btn-modal cancel" id="apiCancel">Cancel</button>
+        <button class="btn-modal submit" id="apiSave">Save</button>
+      </div>
+      <div class="submit-status" id="apiStatus"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector("#apiCancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+  overlay.querySelector("#apiSave").onclick = () => saveApiKeys(overlay);
+}
+
+function toggleKeyVis(btn) {
+  const input = btn.parentElement.querySelector("input");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+async function saveApiKeys(overlay) {
+  const statusEl = overlay.querySelector("#apiStatus");
+  const saveBtn = overlay.querySelector("#apiSave");
+  const keys = {};
+
+  API_KEY_DEFS.forEach(d => {
+    const val = overlay.querySelector(`#apikey_${d.key}`).value.trim();
+    if (val) keys[d.key] = val;
+  });
+
+  if (Object.keys(keys).length === 0) {
+    statusEl.className = "submit-status error";
+    statusEl.textContent = "No keys entered.";
+    return;
+  }
+
+  saveBtn.disabled = true;
+  statusEl.className = "submit-status";
+  statusEl.textContent = "Saving...";
+
+  try {
+    const resp = await fetch("/api/env-keys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keys }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      statusEl.className = "submit-status success";
+      statusEl.textContent = "Keys saved successfully.";
+      setTimeout(() => overlay.remove(), 1200);
+    } else {
+      statusEl.className = "submit-status error";
+      statusEl.textContent = data.error || "Failed to save keys.";
+      saveBtn.disabled = false;
+    }
+  } catch (e) {
+    statusEl.className = "submit-status error";
+    statusEl.textContent = "Network error: " + e.message;
+    saveBtn.disabled = false;
+  }
+}
+
+// ============= How to Use =============
+function openHowToUseModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "howto-overlay";
+
+  const koContent = `
+      <h2>EditPPT 사용 가이드</h2>
+      <h3>사용 단계</h3>
+      <h4>1단계: 파일 업로드</h4>
+      <p><code>.pptx</code> 파일을 업로드 영역에 드래그 앤 드롭하거나, 파일 선택 버튼을 클릭하세요. 업로드 전에 <strong>API Key Settings</strong>에서 키를 설정할 수 있습니다.</p>
+      <h4>2단계: 편집 요청 입력</h4>
+      <p>왼쪽 패널의 텍스트 영역에 자연어 명령을 입력하세요. <strong>대상 슬라이드</strong>, <strong>대상 객체</strong>, <strong>액션</strong>을 명확히 제시하세요:</p>
+      <ul>
+        <li><code>"2~5번 슬라이드 제목에서 '2025년' 이라고 된 부분을 '2026년'으로 바꿔."</code> </li>
+        <li><code>"모든 슬라이드를 영어로 번역해"</code> </li>
+        <li><code>"7번 슬라이드 본문을 요약하고 중요한 부분을 강조해."</code> </li>
+        <li><code>"3번 슬라이드 표 헤더 행을 파란색으로 강조해"</code> </li>
+        <li><code>"4번 슬라이드 막대 차트 제목을 '매출 보고서'로 변경해"</code> </li>
+      </ul>
+      <p><strong>Enter</strong>로 제출 (줄바꿈은 <strong>Shift + Enter</strong>)</p>
+      <h4>3단계: AI 작업 과정 확인</h4>
+      <p>하단 패널에서 실시간 로그를 확인하고, 메인 뷰어에서 Before/After 스크린샷을 볼 수 있습니다.</p>
+      <p>AI 파이프라인: <strong>Planner</strong> (작업 분해) → <strong>Dispatcher</strong> (에이전트 라우팅) → <strong>Agent</strong> (도구 실행) → <strong>Validator</strong> (결과 검증)</p>
+      <h4>4단계: 결과 확인</h4>
+      <p>뷰어 상단의 화살표 버튼 (← →)으로 슬라이드를 탐색하세요. Before / After 비교가 나란히 표시됩니다.</p>
+      <h4>5단계: 재시도 또는 롤백</h4>
+      <ul>
+        <li><strong>단일 슬라이드 재시도:</strong> 히스토리 패널에서 슬라이드 위에 마우스를 올리고 ↻ 클릭</li>
+        <li><strong>전체 요청 재시도:</strong> 요청 항목에서 ↻ 클릭</li>
+        <li><strong>단일 슬라이드 롤백:</strong> ↩ 클릭하여 해당 슬라이드 변경 취소</li>
+        <li><strong>전체 요청 롤백:</strong> 요청에서 ↩ 클릭하여 모든 변경 취소</li>
+      </ul>
+      <h4>6단계: 저장 및 종료</h4>
+      <p>헤더의 <strong>Close File</strong> 클릭 후:</p>
+      <ul>
+        <li><strong>Save</strong> — 편집 내용을 원본에 저장</li>
+        <li><strong>Save As...</strong> — 새 파일명으로 사본 저장</li>
+        <li><strong>Don't Save</strong> — 편집 취소 후 원본 복원</li>
+      </ul>
+      <hr>
+      <h3>편집 기능</h3>
+      <table>
+        <tr><th>에이전트</th><th>처리 내용</th><th>요청 예시</th></tr>
+        <tr><td><strong>텍스트</strong></td><td>텍스트 재작성, 번역, 삽입, 삭제, 치환</td><td>"3번 슬라이드를 한국어로 번역"</td></tr>
+        <tr><td><strong>스타일</strong></td><td>폰트, 색상, 크기, 굵기/기울임, 밑줄, 불릿</td><td>"제목을 굵은 빨간색으로"</td></tr>
+        <tr><td><strong>표</strong></td><td>셀 내용, 표 텍스트 스타일링</td><td>"표 헤더를 영어로 번역"</td></tr>
+        <tr><td><strong>차트</strong></td><td>차트 데이터 및 서식</td><td>"막대 차트 값 업데이트"</td></tr>
+        <tr><td><strong>도형 & 레이아웃</strong></td><td>위치, 크기, 도형 생성/삭제, 이미지</td><td>"로고를 우측 상단으로 이동"</td></tr>
+        <tr><td><strong>슬라이드</strong></td><td>추가/삭제/복제, 전환 효과, 배경</td><td>"모든 슬라이드에 페이드 전환 추가"</td></tr>
+      </table>
+      <hr>
+      <h3>추가 기능</h3>
+      <ul>
+        <li><strong>자동 크기 조정:</strong> 헤더 ⚙ → Auto-resize text (기본 ON). 편집 후 텍스트가 도형 안에 맞도록 폰트 자동 조정</li>
+        <li><strong>이미지 검색/생성/편집:</strong> Pexels/Unsplash 검색, Gemini로 이미지 생성 및 편집</li>
+        <li><strong>토큰 사용량:</strong> 헤더 $ 아이콘 클릭 → 입출력 토큰 수 및 예상 비용 확인</li>
+        <li><strong>실시간 로그:</strong> 하단 패널에서 색상별 로그 확인 (파란색=INFO, 주황색=WARNING, 빨간색=ERROR)</li>
+        <li><strong>버그 리포트:</strong> 헤더 깃발 아이콘 → 제목/카테고리 입력 후 관리자 Discord로 자동 전달</li>
+      </ul>`;
+
+  const enContent = `
+      <h2>EditPPT User Guide</h2>
+      <h3>Step-by-Step Guide</h3>
+      <h4>Step 1: Upload Your File</h4>
+      <p>Drag and drop a <code>.pptx</code> file onto the upload area, or click <strong>Browse Files</strong>. You can configure API keys via <strong>API Key Settings</strong> before uploading.</p>
+      <h4>Step 2: Enter an Edit Request</h4>
+      <p>Type a natural language instruction. Be specific about <strong>target slides</strong>, <strong>target objects</strong>, and <strong>action</strong>:</p>
+      <ul>
+        <li><code>"Replace '2025' with '2026' in the titles on slides 2 through 5."</code></li>
+        <li><code>"Translate all slides to English."</code></li>
+        <li><code>"Summarize the body text and highlight the key points in slide 7."</code></li>
+        <li><code>"Highlight the table header row in blue on slide 3."</code></li>
+        <li><code>"Change the bar chart title to 'Sales Report' on slide 4."</code></li>
+      </ul>
+      <p>Press <strong>Enter</strong> to submit (use <strong>Shift + Enter</strong> for a new line).</p>
+      <h4>Step 3: Watch the AI Work</h4>
+      <p>View real-time logs in the bottom panel and Before/After screenshots in the main viewer.</p>
+      <p>AI Pipeline: <strong>Planner</strong> (task breakdown) → <strong>Dispatcher</strong> (agent routing) → <strong>Agent</strong> (tool execution) → <strong>Validator</strong> (result verification)</p>
+      <h4>Step 4: Review Results</h4>
+      <p>Use the <strong>arrow buttons</strong> (← →) in the viewer header to navigate slides. Each shows a side-by-side <strong>Before / After</strong> comparison.</p>
+      <h4>Step 5: Retry or Rollback</h4>
+      <ul>
+        <li><strong>Retry a single slide:</strong> Hover over a slide in the history panel and click ↻</li>
+        <li><strong>Retry entire request:</strong> Hover over a request entry and click ↻</li>
+        <li><strong>Rollback a single slide:</strong> Click ↩ to undo that slide's changes</li>
+        <li><strong>Rollback entire request:</strong> Click ↩ on the request to undo all changes</li>
+      </ul>
+      <h4>Step 6: Save and Close</h4>
+      <p>Click <strong>Close File</strong> in the header:</p>
+      <ul>
+        <li><strong>Save</strong> — Keep all edits in the original file</li>
+        <li><strong>Save As...</strong> — Save a copy with a new filename</li>
+        <li><strong>Don't Save</strong> — Discard all edits and restore the original</li>
+      </ul>
+      <hr>
+      <h3>Editing Capabilities</h3>
+      <table>
+        <tr><th>Agent</th><th>What It Handles</th><th>Example Requests</th></tr>
+        <tr><td><strong>Text</strong></td><td>Rewrite, translate, insert, delete, replace</td><td>"Translate slide 3 to Korean"</td></tr>
+        <tr><td><strong>Style</strong></td><td>Font, color, size, bold/italic, underline, bullets</td><td>"Make titles bold and red"</td></tr>
+        <tr><td><strong>Table</strong></td><td>Cell content, table text styling</td><td>"Translate table headers to English"</td></tr>
+        <tr><td><strong>Chart</strong></td><td>Chart data and formatting</td><td>"Update the bar chart values"</td></tr>
+        <tr><td><strong>Shape & Layout</strong></td><td>Position, size, create/delete shapes, images</td><td>"Move the logo to the top-right"</td></tr>
+        <tr><td><strong>Slide</strong></td><td>Add/delete/duplicate, transitions, background</td><td>"Add fade transition to all slides"</td></tr>
+      </table>
+      <hr>
+      <h3>Additional Features</h3>
+      <ul>
+        <li><strong>Auto-resize:</strong> Header ⚙ → Auto-resize text (default ON). Automatically shrinks font to fit within shape boundaries after edits.</li>
+        <li><strong>Image search/generate/edit:</strong> Pexels/Unsplash search, Gemini-powered image generation and editing</li>
+        <li><strong>Token usage:</strong> Click $ icon in header → view input/output token counts and estimated cost</li>
+        <li><strong>Real-time logs:</strong> Color-coded logs in bottom panel (Blue=INFO, Orange=WARNING, Red=ERROR)</li>
+        <li><strong>Bug report:</strong> Click flag icon in header → submit reports, automatically sent to admin Discord</li>
+      </ul>`;
+
+  overlay.innerHTML = `
+    <div class="howto-modal">
+      <div class="howto-top-bar">
+        <span class="lang-toggle">
+          <button class="active" data-lang="ko">KO</button>
+          <button data-lang="en">EN</button>
+        </span>
+        <button class="howto-close-btn" title="Close">&times;</button>
+      </div>
+      <div class="howto-body">${koContent}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Language toggle
+  const body = overlay.querySelector(".howto-body");
+  const btns = overlay.querySelectorAll(".lang-toggle button");
+  btns.forEach(btn => {
+    btn.onclick = () => {
+      btns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      body.innerHTML = btn.dataset.lang === "en" ? enContent : koContent;
+    };
+  });
+
+  overlay.querySelector(".howto-close-btn").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+// ============= Bug Report =============
+function openBugReportModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "bugreport-overlay";
+
+  const hasContext = selectedRequestId !== null;
+
+  overlay.innerHTML = `
+    <div class="bugreport-modal">
+      <h3>Bug Report / Feedback</h3>
+      <label for="brTitle">Title *</label>
+      <input type="text" id="brTitle" placeholder="Brief summary of the issue">
+      <label for="brCategory">Category</label>
+      <select id="brCategory">
+        <option>Bug - Error occurred</option>
+        <option>Bug - Incorrect edit</option>
+        <option>Bug - UI issue</option>
+        <option>Improvement</option>
+        <option>Other</option>
+      </select>
+      <label for="brDesc">Description</label>
+      <textarea id="brDesc" placeholder="Additional details (optional)"></textarea>
+      <div class="checkbox-row">
+        <input type="checkbox" id="brContext" ${hasContext ? "checked" : "disabled"}>
+        <label for="brContext" style="margin:0;font-weight:400;">
+          Include context (before/after images + logs)${hasContext ? " — Request #" + selectedRequestId : " — no request selected"}
+        </label>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-modal cancel" id="brCancel">Cancel</button>
+        <button class="btn-modal submit" id="brSubmit">Submit</button>
+      </div>
+      <div class="submit-status" id="brStatus"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector("#brCancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  overlay.querySelector("#brSubmit").onclick = () => submitBugReport(overlay);
+  // Focus title input
+  overlay.querySelector("#brTitle").focus();
+}
+
+async function submitBugReport(overlay) {
+  const title = overlay.querySelector("#brTitle").value.trim();
+  const category = overlay.querySelector("#brCategory").value;
+  const description = overlay.querySelector("#brDesc").value.trim();
+  const includeContext = overlay.querySelector("#brContext").checked;
+  const statusEl = overlay.querySelector("#brStatus");
+  const submitBtn = overlay.querySelector("#brSubmit");
+
+  if (!title) {
+    statusEl.className = "submit-status error";
+    statusEl.textContent = "Title is required.";
+    return;
+  }
+
+  submitBtn.disabled = true;
+  statusEl.className = "submit-status";
+  statusEl.innerHTML = '<span class="spinner-inline"></span>Submitting...';
+
+  try {
+    const payload = {
+      title,
+      category,
+      description,
+      include_context: includeContext,
+    };
+    if (includeContext && selectedRequestId !== null) {
+      payload.request_id = selectedRequestId;
+    }
+
+    const resp = await fetch("/api/bug-report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      statusEl.className = "submit-status error";
+      statusEl.textContent = data.error || "Failed to submit report.";
+      submitBtn.disabled = false;
+      return;
+    }
+
+    statusEl.className = "submit-status success";
+    statusEl.textContent = 'Report submitted successfully!';
+    submitBtn.style.display = "none";
+    // Auto-close after 3 seconds
+    setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 3000);
+  } catch (err) {
+    statusEl.className = "submit-status error";
+    statusEl.textContent = "Network error: " + err.message;
+    submitBtn.disabled = false;
+  }
+}
+
+// ============= Init =============
+// Sync dark mode checkbox with saved preference
+if (document.documentElement.getAttribute("data-theme") === "dark") {
+  const chk = document.getElementById("chkDarkMode");
+  if (chk) chk.checked = true;
+}
+
+(async function loadHistory() {
+  try {
+    const resp = await fetch("/api/history");
+    const data = await resp.json();
+    historyData = data;
+    if (historyData.length > 0) {
+      selectedRequestId = historyData[historyData.length - 1].request_id;
+    }
+    renderHistory();
+    renderViewer();
+    updateTokenButton();
+  } catch (e) {
+    console.error("Failed to load history", e);
+  }
+
+})();
+
+// ============= Auto Tour for first-time users =============
+(function autoTourCheck() {
+  if (localStorage.getItem("editppt_tour_done")) return;
+  // Wait for Driver.js to load
+  const wait = setInterval(() => {
+    if (window.driver) {
+      clearInterval(wait);
+      setTimeout(() => startTour(), 500);
+    }
+  }, 200);
+  // Give up after 5s
+  setTimeout(() => clearInterval(wait), 5000);
+})();
+
+// ============= Product Tour (Driver.js) =============
+function startTour() {
+  const isEditScreen = document.getElementById("editSection").style.display !== "none";
+  if (isEditScreen) {
+    startEditTour();
+  } else {
+    startUploadTour();
+  }
+}
+
+function startUploadTour() {
+  if (!window.driver) { alert("Tour library failed to load."); return; }
+  const tour = window.driver.js.driver({
+    showProgress: true,
+    animate: true,
+    allowClose: true,
+    doneBtnText: "Done",
+    nextBtnText: "Next",
+    prevBtnText: "Back",
+    onDestroyed: () => { localStorage.setItem("editppt_tour_done", "1"); },
+    steps: [
+      {
+        element: "#uploadBox",
+        popover: {
+          title: "Upload Presentation",
+          description: "PPTX 파일을 여기에 드래그하거나 클릭하여 업로드하세요.",
+          side: "bottom", align: "center"
+        }
+      },
+      {
+        element: ".btn-api-settings",
+        popover: {
+          title: "API Key Settings",
+          description: "먼저 API Key를 설정하세요. <b>OpenAI API Key는 필수입니다.</b>",
+          side: "top", align: "center"
+        }
+      },
+      {
+        element: ".btn-shutdown",
+        popover: {
+          title: "Server Shutdown",
+          description: "브라우저를 닫아도 서버는 계속 실행되기 때문에, 작업이 끝나면 이 버튼으로 서버를 직접 종료해주세요.",
+          side: "bottom", align: "end"
+        }
+      }
+    ]
+  });
+  tour.drive();
+}
+
+function startEditTour() {
+  if (!window.driver) { alert("Tour library failed to load."); return; }
+
+  // mock 히스토리 전체 (request + slides) 미리 생성 (hidden)
+  let mockWrap = document.getElementById("tourMockHistory");
+  if (!mockWrap) {
+    mockWrap = document.createElement("div");
+    mockWrap.id = "tourMockHistory";
+    mockWrap.style.cssText = "display:none;";
+
+    // Mock request item
+    mockWrap.innerHTML = `
+      <div class="history-item" style="background:var(--bg-card); border-radius:6px; padding:0;">
+        <div class="req-label" style="display:flex; align-items:center; gap:6px; padding:8px 10px;">
+          <span style="color:#22c55e;">●</span> #1
+          <span id="tourMockReqActions" class="req-actions" style="display:inline-flex; gap:2px; margin-left:auto;">
+            <button class="btn-action-sm revert" style="pointer-events:none; opacity:1;" title="Revert entire request">↩</button>
+            <button class="btn-action-sm retry" style="pointer-events:none; opacity:1;" title="Retry entire request">↻</button>
+          </span>
+        </div>
+        <div class="req-text" style="padding:0 10px 6px 10px; font-size:12px; color:var(--text-muted);">모든 슬라이드를 영어로 번역해</div>
+        <div id="tourMockSlides" style="padding:4px 0; font-size:13px;">
+          ${[
+            { idx: 1, status: "done" },
+            { idx: 2, status: "done" },
+            { idx: 3, status: "error" },
+          ].map(s => {
+            const dot = s.status === "done"
+              ? '<span style="color:#22c55e;">●</span>'
+              : '<span style="color:#ef4444;">●</span>';
+            return '<div class="slide-child" style="display:flex;align-items:center;padding:3px 8px 3px 24px;gap:6px;font-size:13px;">'
+              + dot + ' Slide ' + s.idx
+              + '<span class="slide-child-actions" style="margin-left:auto;display:flex;gap:2px;opacity:1;">'
+              + '<button class="btn-action-sm revert" style="pointer-events:none;" title="Revert">↩</button>'
+              + '<button class="btn-action-sm retry" style="pointer-events:none;" title="Retry">↻</button>'
+              + '</span></div>';
+          }).join("")}
+        </div>
+      </div>
+    `;
+
+    const panel = document.querySelector(".history-panel .history-list") || document.querySelector(".history-panel");
+    if (panel) panel.appendChild(mockWrap);
+  }
+
+  // Mock viewer retry/revert buttons in .viewer-nav
+  let mockViewerBtns = document.getElementById("tourMockViewerBtns");
+  if (!mockViewerBtns) {
+    mockViewerBtns = document.createElement("span");
+    mockViewerBtns.id = "tourMockViewerBtns";
+    mockViewerBtns.style.cssText = "display:none; gap:4px;";
+    mockViewerBtns.innerHTML = `
+      <button class="btn-retry" style="pointer-events:none;" title="Retry">↻</button>
+      <button class="btn-rollback" style="pointer-events:none;" title="Revert">↩</button>
+    `;
+    const navEl = document.querySelector(".viewer-nav");
+    if (navEl) navEl.prepend(mockViewerBtns);
+  }
+
+  const tour = window.driver.js.driver({
+    showProgress: true,
+    animate: true,
+    allowClose: true,
+    doneBtnText: "Done",
+    nextBtnText: "Next",
+    prevBtnText: "Back",
+    onDestroyed: () => {
+      const mh = document.getElementById("tourMockHistory"); if (mh) mh.remove();
+      const mv = document.getElementById("tourMockViewerBtns"); if (mv) mv.remove();
+      localStorage.setItem("editppt_tour_done", "1");
+    },
+    steps: [
+      {
+        element: "#userInput",
+        popover: {
+          title: "Edit Instructions",
+          description: "편집 지시를 자연어로 입력하세요. 수정하는 대상 슬라이드, 객체와 행동을 명확히 제시하세요.<br><br>ex) 2번~5번 슬라이드 제목을 ~~로 바꿔.<br>ex) 모든 슬라이드를 영어로 번역해.",
+          side: "right", align: "start"
+        }
+      },
+      {
+        element: "#btnSubmit",
+        popover: {
+          title: "Submit",
+          description: "Submit 버튼 또는 Enter 키로 요청을 전송합니다.",
+          side: "right", align: "center"
+        }
+      },
+      {
+        element: "#slideViewer",
+        popover: {
+          title: "Slide Viewer",
+          description: "편집 전/후 슬라이드를 비교할 수 있습니다.",
+          side: "left", align: "center"
+        },
+        onDeselected: () => {
+          // step 3 → step 4 전환 시 mock을 미리 보여줌
+          const mh = document.getElementById("tourMockHistory");
+          if (mh) mh.style.display = "";
+        }
+      },
+      {
+        element: "#tourMockReqActions",
+        popover: {
+          title: "Request Retry / Revert",
+          description: "요청 단위로 전체 Revert(↩) 또는 Retry(↻) 할 수 있습니다.<br><br>• <b>↩ Revert:</b> 해당 요청의 모든 편집을 되돌립니다.<br>• <b>↻ Retry:</b> 해당 요청을 처음부터 재시도합니다.",
+          side: "right", align: "start"
+        },
+        onHighlightStarted: () => {
+          const mh = document.getElementById("tourMockHistory");
+          if (mh) mh.style.display = "";
+        },
+        onDeselected: () => {
+          const mh = document.getElementById("tourMockHistory");
+          if (mh) mh.style.display = "none";
+          const mv = document.getElementById("tourMockViewerBtns");
+          if (mv) mv.style.display = "none";
+        }
+      },
+      {
+        element: "#tourMockSlides",
+        popover: {
+          title: "Slide-level Retry / Revert",
+          description: "각 슬라이드별로 개별 Retry(↻) / Revert(↩) 가 가능합니다.<br><br>Slide Viewer 상단에서도 동일한 버튼으로 Retry(↻) / Revert(↩) 할 수 있습니다.<br><br>(아직은 해당 버튼을 누르면 해당 슬라이드 이후의 수정도 함께 Retry/Revert 됩니다. 현재 개선 중...)",
+          side: "right", align: "start"
+        },
+        onHighlightStarted: () => {
+          const mh = document.getElementById("tourMockHistory");
+          if (mh) mh.style.display = "";
+          const mv = document.getElementById("tourMockViewerBtns");
+          if (mv) mv.style.display = "inline-flex";
+          const vh = document.getElementById("viewerHeader");
+          if (vh) vh.style.display = "";
+        },
+        onDeselected: () => {
+          const mh = document.getElementById("tourMockHistory");
+          if (mh) mh.style.display = "none";
+          const mv = document.getElementById("tourMockViewerBtns");
+          if (mv) mv.style.display = "none";
+          const vh = document.getElementById("viewerHeader");
+          if (vh && !selectedRequestId) vh.style.display = "none";
+        }
+      },
+      {
+        element: "#logPanel",
+        popover: {
+          title: "Log Panel",
+          description: "AI 파이프라인 실행 로그를 실시간으로 확인할 수 있습니다.",
+          side: "top", align: "center"
+        }
+      },
+      {
+        element: "#btnOptions",
+        popover: {
+          title: "Options",
+          description: "다양한 옵션을 ON/OFF 할 수 있습니다.<br><br>• <b>Auto-resize:</b> 활성화 시, 텍스트 편집 후 내용이 텍스트 박스를 넘칠 경우 자동으로 글자 크기를 줄여 맞춰줍니다.",
+          side: "bottom", align: "center"
+        }
+      },
+      {
+        element: "#btnTokenUsage",
+        popover: {
+          title: "Billing Cost",
+          description: "현재까지 사용된 LLM API 토큰 수와 예상 비용을 확인할 수 있습니다.",
+          side: "bottom", align: "center"
+        }
+      },
+      {
+        element: "#btnBugReport",
+        popover: {
+          title: "Bug Report / Feedback",
+          description: "버그 리포트 또는 피드백을 보낼 수 있습니다. 제출 시 관리자 Discord로 자동 전달됩니다.",
+          side: "bottom", align: "center"
+        }
+      },
+      {
+        element: "#btnHowToUse",
+        popover: {
+          title: "How to Use",
+          description: "더 자세한 사용법은 이 버튼을 클릭하여 확인하세요.",
+          side: "bottom", align: "center"
+        }
+      }
+    ]
+  });
+  tour.drive();
+}
+</script>
+</body>
+</html>

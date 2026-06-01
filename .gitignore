@@ -1,0 +1,84 @@
+# Environment & secrets
+.env
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist*/
+build*/
+
+# Logs & runtime artifacts
+logfiles/
+.analytics_id
+.server_port
+_update_complete.md
+.SlideScreenshots/
+uploads/
+
+# Experiment outputs (runner scripts, prompts, samples, docs stay tracked)
+experiments/runs/
+experiments/dual_eval/
+experiments/outputs/
+experiments/ablation/
+experiments/ablation2_unified_validator/
+experiments/judge/
+experiments/_compare/
+experiments/main_batch_*.log
+experiments/batch_*.log
+experiments/samples/Defect/
+
+# Per-run PowerPoint backups created during execution
+experiments/samples/**/*_pristine.pptx
+experiments/samples/**/*_.pptx
+
+# Throwaway analysis output
+scripts/_repro_out/
+
+# One-off / scratch working files (kept locally, never tracked)
+_scratch/
+**/archive/
+
+# PowerPoint files
+/*.pptx
+editppt/*.pptx
+
+# Test data
+test_slides/
+test.json
+paragraph_ir.txt
+
+# IDE & editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project internal
+instructions.txt
+editppt/examples/
+editppt/experiments/
+editppt/legacy/
+editppt/extracted_images/
+editppt/result*
+
+# Claude Code
+.claude/
+
+# Local test scripts
+run_testcase.ps1
+
+# Build artifacts & temp files
+*.spec.bak
+com_debug.txt
+*.docx
+LANDING_PAGE_NOTION.md
+
+# Experiment scratch / analysis working files (underscore-prefixed)
+experiments/_*
+experiments/analyze_*.py
+
+# Draft README (work in progress, written separately)
+README_DRAFT.md

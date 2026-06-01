@@ -8,7 +8,7 @@
 
 Give it a natural-language instruction — *"Change all titles to red"*, *"Summarize slide 3 into three bullets"* — and EditPPT plans the edits, runs them on your `.pptx` via PowerPoint COM automation, and validates the result before saving.
 
-📊 **[Benchmark Dataset](https://example.com/editppt-benchmark)** &nbsp;·&nbsp; ▶️ **[Live Demo](https://example.com/editppt-demo)** &nbsp;·&nbsp; Project page: *(tbd)*
+📊 **[Benchmark Dataset](https://huggingface.co/datasets/EditPPT/DECKEDIT-BENCH)**
 
 
 ## Results
@@ -17,30 +17,38 @@ Give it a natural-language instruction — *"Change all titles to red"*, *"Summa
   <img src="figure/main_graph.png" width="70%" alt="EditPPT performance vs. baselines">
 </p>
 
-Evaluated against PPTPilot, Talk-to-your-slides, and Claude Code + PPTX Skill on **instruction following**, **content preservation**, and **average cost per slide**.
+Evaluated against PPTPilot, Talk-to-your-slides, and Claude Code + PPTX Skill on **instruction following**, **content preservation**, and **average cost per slide**. Our method delivers the **strongest content preservation** of the four — it applies the requested edit without disturbing the rest of the deck — while staying competitive on instruction following at a moderate per-slide cost.
 
 
 ## Benchmark
 
-EditPPT is evaluated on a benchmark of natural-language PowerPoint editing tasks spanning two axes — instruction style (**Explicit** / **Pattern**) × complexity (**Simple** / **Compound**) — across short, medium, and long decks.
-Dataset and evaluation scripts: **[link](tbd)** .
+EditPPT is evaluated on **DECKEDIT-Bench**, a benchmark of **183 natural-language editing prompts across 28 real-world decks**, spanning three length strata (Short ≤10 slides · Medium 11–30 · Long >30) and two languages (English and Korean). Each prompt is labelled along two axes — instruction style (**Explicit** / **Pattern**) × complexity (**Simple** / **Compound**) — and tagged with its edit actions (add / delete / replace / slide-level) and edit targets, so results can be broken down by capability.
+Dataset: **[DECKEDIT-BENCH on Hugging Face](https://huggingface.co/datasets/EditPPT/DECKEDIT-BENCH)**.
+
+**Example edits** — actual EditPPT runs (before → after):
 
 <table>
   <tr>
-    <td width="33%"><img src="figure/2_ExplicitSimple_Medium_10_MOSFET_HCI-03_s12.png" alt="Explicit · Simple sample"></td>
-    <td width="33%"><img src="figure/3_ExplicitCompound_Medium_09_ImpactReporting-04_s20.png" alt="Explicit · Compound sample"></td>
-    <td width="33%"><img src="figure/6_PatternSimple_Long_02_UTI-02_s5.png" alt="Pattern · Simple sample"></td>
+    <th align="left">Instruction</th>
+    <th align="center">Before</th>
+    <th align="center">After</th>
   </tr>
-  <tr align="center">
-    <td>Explicit · Simple <sub>(Medium)</sub></td>
-    <td>Explicit · Compound <sub>(Medium)</sub></td>
-    <td>Pattern · Simple <sub>(Long)</sub></td>
+  <tr>
+    <td><b>Recolor the two device-state labels</b><br>(<span>blue</span> / <span>red</span>) <br><sub>Explicit · single slide</sub></td>
+    <td><img src="figure/ex1_recolor_before.jpg" width="340" alt="before — labels in black"></td>
+    <td><img src="figure/ex1_recolor_after.jpg" width="340" alt="after — labels recolored blue and red"></td>
+  </tr>
+  <tr>
+    <td><b>Translate the deck into Korean</b><br><sub>incl. text inside figures · every slide</sub></td>
+    <td><img src="figure/ex2_translate_before.jpg" width="340" alt="before — English slide"></td>
+    <td><img src="figure/ex2_translate_after.jpg" width="340" alt="after — Korean slide"></td>
+  </tr>
+  <tr>
+    <td><b>Change the chart to a pie chart</b><br><sub>Explicit · single chart</sub></td>
+    <td><img src="figure/ex3_chart_before.jpg" width="340" alt="before — donut chart"></td>
+    <td><img src="figure/ex3_chart_after.jpg" width="340" alt="after — pie chart"></td>
   </tr>
 </table>
-
-## Demo
-
-Watch EditPPT edit a deck end-to-end: **[demo](https://example.com/editppt-demo)** *(dummy — to be replaced)*.
 
 ## Requirements
 
@@ -51,9 +59,9 @@ Watch EditPPT edit a deck end-to-end: **[demo](https://example.com/editppt-demo)
 ## Installation
 
 ```cmd
-git clone <repository-url>   # TBD
+git clone https://github.com/editppt1/EditPPT.git
 cd EditPPT
-poetry install               # or: pip install -r requirements.txt
+poetry install
 ```
 
 Set `OPENAI_API_KEY` (required). Optional: `GEMINI_API_KEY` for vision validation / image generation.
